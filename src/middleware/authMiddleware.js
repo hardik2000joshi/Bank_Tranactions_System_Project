@@ -26,13 +26,33 @@ async function authMiddleware(req, res, next){
 
 // along with auth middleware we also have to create auth system user middleware to create initial funds transaction from system user
 async function authSystemUserMiddleware(req, res, next){
-    const token = req.cookies.token
+    const token = req.cookies.JWT_Token
     if(!token){
         return res.status(401).json({
             message: "Unauthorized access, token is missing"
         })
     }
-    
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const user = await userModel.findById(decoded.userId)
+        if(!user){
+            return res.status(403).json({
+                message: "Forbidden access, not a system user"
+            })
+    }
+    req.user = user
+    return next()
 }
 
-module.exports = {authMiddleware}
+catch(error){
+return res.status(401).json({
+    message: "unauthorized access, token is invalid"
+})
+}
+}
+
+module.exports = {
+    authMiddleware,
+    authSystemUserMiddleware
+}

@@ -8,5 +8,5 @@ const router = express.Router();
 router.post("/", authMiddleware.authMiddleware, transaction.createTransaction)
 
 // POST API - Create initial funds transaction from system user
-
+router.post("/system/initial-funds", authMiddleware.authSystemUserMiddleware, transaction.createInitialFundsTransaction)
 module.exports = router;
