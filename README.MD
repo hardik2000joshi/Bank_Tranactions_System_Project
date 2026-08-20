@@ -41,7 +41,7 @@ This repository contains the backend implementation of a banking transaction sys
 
 Nodemailer is used to send confirmation emails for user registration and transaction status, including successful and failed transactions.
 
-Clone the repository git clone https://github.com/hardik2000joshi/Authentication_Authorization_Node.git
+Clone the repository git clone https://github.com/hardik2000joshi/Bank_Tranactions_System_Project.git
 
 Move into the project directory cd Bank_Tranactions_System_Project
 
