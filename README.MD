@@ -40,3 +40,13 @@ This repository contains the backend implementation of a banking transaction sys
 ## Email Service
 
 Nodemailer is used to send confirmation emails for user registration and transaction status, including successful and failed transactions.
+
+Clone the repository git clone https://github.com/hardik2000joshi/Authentication_Authorization_Node.git
+
+Move into the project directory cd Bank_Tranactions_System_Project
+
+Initialize the project (Skip if package.json already exists) npm init -y
+
+Install dependencies npm install express npm install mongoose
+
+Install Nodemon (Optional) npm install --save-dev nodemon or globally
