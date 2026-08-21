@@ -23,7 +23,7 @@ const userSchema = mongoose.Schema({
             type: Boolean,
             immutable: true,
             default: false,
-            select: false
+            select: true
         }
 }, {
     timestamps: true   // to get when user created and when user details get updated last time

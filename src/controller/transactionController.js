@@ -40,8 +40,9 @@ const toUserAccount = await accountModel.findOne({
 
 if(!fromUserAccount || !toUserAccount){
     return res.status(400).json({
-        message: "Invalid fromAccount or toAccount"
+        message: "Invalid fromAccount or toAccount",
     })
+    
 }
 
 // Step-2: validate idempotency key
@@ -96,36 +97,43 @@ if(balance < amount){
 
 
     // create transaction
+    try{
     const session = await mongoose.startSession()
         session.startTransaction()
-        const transaction = await transactionModel.create({
+        const transaction = await transactionModel.create([{
             fromAccount,
             toAccount,
             amount,
             idempotencyKey,
             status: "PENDING"
-        }, {session})
+        }], {session})
+
+        const transactions = transaction[0];
 
         // create debitLedgerEntry
-        const debitLedgerEntry = await ledgerModel.create({
+        const debitLedgerEntry = await ledgerModel.create([{
             account: fromAccount,
             amount: amount,
-            transaction: transaction._id,
+            transaction: transactions._id,
             type: "DEBIT"
-        }, {sesssion})
+        }], {session})
 
         // create creditLedgerEntry
-        const creditLedgerEntry = await ledgerModel.create({
+        const creditLedgerEntry = await ledgerModel.create([{
             account: toAccount,
             amount: amount,
-            transaction: transaction._id,
+            transaction: transactions._id,
             type: "CREDIT"
-        }, {session})
+        }], {session})
+
+        console.log("DEBIT LEDGER:", debitLedgerEntry);
+console.log("CREDIT LEDGER:", creditLedgerEntry);
+console.log("TRANSACTION COMMITTED");
 
         // transaction status completed
         await transactionModel.findOneAndUpdate(
             {
-                _id: transaction._id
+                _id: transactions._id
             },
             {
                 status: "COMPLETED"
@@ -135,11 +143,14 @@ if(balance < amount){
             }
         )
 
+        transactions.status = "COMPLETED";
+
         // commit mongodb session
         await session.commitTransaction()  // Commits the currently active transaction in this session.
 
         // end mongodb session
         session.endSession()
+    
 
         // send email notification
         await emailService.sendTransactionEmail(
@@ -151,8 +162,15 @@ if(balance < amount){
 
         return res.status(201).json({
             message: "Transaction Completed Successfully",
-            transaction: transaction
+            transaction: transactions
         })
+        }
+    catch(error){
+        console.log("TRANSACTION ERROR:", error);
+          return res.status(400).json({
+            message: "Transaction is Pending due to some issue, please retry after sometime",
+        })
+    }
     }
 
 async function createInitialFundsTransaction(req, res){  // to whose account funds transferred, how much amount transferred and idempotency key

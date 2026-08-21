@@ -26,3 +26,8 @@ Ledger process:
 
 Idempotency key - to ensure amount not deducted twice for same payment or same transaction we ensure that through idempotency key
 like UPI application sending same request again and again payment done or not
+
+
+to which account we transferred: 6a85b9464004e19c13a338db
+
+account created of user:  6a86c722a1f0fc7d59a41a28
